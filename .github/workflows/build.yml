@@ -36,7 +36,7 @@ jobs:
       BUILD_DATE: ${{steps.get-tag.outputs.BUILD_DATE}}
       BUILD_DATE_UNIX: ${{steps.get-tag.outputs.BUILD_DATE_UNIX}}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           sparse-checkout: .
       - name: Select build tag
@@ -66,7 +66,7 @@ jobs:
           fi
           cat $GITHUB_OUTPUT
           cat $GITHUB_OUTPUT >> parameters.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: parameters
           path: |
@@ -77,7 +77,7 @@ jobs:
     needs: [prepare]
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build
         env:
           LLVM_VERSION: ${{needs.prepare.outputs.LLVM_VERSION}}
@@ -98,7 +98,7 @@ jobs:
           NAME=llvm-mingw-stage1-$TAG-ucrt-$DISTRO
           mv llvm-mingw $NAME
           tar -Jcf ../$NAME.tar.xz --format=ustar --numeric-owner --owner=0 --group=0 --sort=name --mtime="$BUILD_DATE" $NAME
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: linux-stage1-ucrt-x86_64-toolchain
           path: |
@@ -109,8 +109,8 @@ jobs:
     needs: [prepare, linux-stage1]
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v8
         with:
           name: linux-stage1-ucrt-x86_64-toolchain
       - name: Unpack stage1 Clang
@@ -128,7 +128,7 @@ jobs:
           # Build LLVM in mostly the same way as it is going to be built in the
           # final form.
           LLVM_CMAKEFLAGS="-DLLVM_ENABLE_LIBXML2=OFF -DLLDB_ENABLE_PYTHON=OFF" ./build-all.sh --profile $(pwd)/llvm-mingw-stage1 --full-llvm
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: profile
           path: |
@@ -140,8 +140,8 @@ jobs:
     needs: [prepare, linux-stage1, linux-profile]
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v8
         with:
           name: linux-stage1-ucrt-x86_64-toolchain
       - name: Unpack stage1 Clang
@@ -149,7 +149,7 @@ jobs:
           tar -Jxf llvm-mingw-*.tar.xz
           rm llvm-mingw-*.tar.xz
           sudo mv llvm-mingw* /opt/llvm-mingw
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: profile
       - name: Build
@@ -171,7 +171,7 @@ jobs:
           NAME=llvm-mingw-$TAG-ucrt-$DISTRO
           mv llvm-mingw $NAME
           tar -Jcf ../$NAME.tar.xz --format=ustar --numeric-owner --owner=0 --group=0 --sort=name --mtime="$BUILD_DATE" $NAME
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: linux-ucrt-x86_64-toolchain
           path: |
@@ -184,8 +184,8 @@ jobs:
     needs: [linux-stage1, linux-profile, prepare]
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v8
         with:
           name: linux-stage1-ucrt-x86_64-toolchain
       - name: Unpack stage1 Clang
@@ -193,7 +193,7 @@ jobs:
           tar -Jxf llvm-mingw-*.tar.xz
           rm llvm-mingw-*.tar.xz
           sudo mv llvm-mingw* /opt/llvm-mingw
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: profile
       - name: Build
@@ -223,7 +223,7 @@ jobs:
           NAME=llvm-mingw-$TAG-ucrt-$DISTRO
           mv llvm-mingw $NAME
           tar -Jcf ../$NAME.tar.xz --format=ustar --numeric-owner --owner=0 --group=0 --sort=name --mtime="$BUILD_DATE" $NAME
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: linux-ucrt-aarch64-toolchain
           path: |
@@ -242,7 +242,7 @@ jobs:
     needs: [prepare]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build
         env:
           LLVM_VERSION: ${{needs.prepare.outputs.LLVM_VERSION}}
@@ -258,7 +258,7 @@ jobs:
           ./run-tests.sh $(pwd)/install/llvm-mingw
           cd install
           tar -Jcf ../llvm-mingw-linux.tar.xz --format=ustar --numeric-owner --owner=0 --group=0 --sort=name --mtime="$BUILD_DATE" llvm-mingw
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: linux-asserts-x86_64-toolchain
           path: |
@@ -291,7 +291,7 @@ jobs:
             toolchain:p
             cmake:p
             ninja:p
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build
         env:
           LLVM_VERSION: ${{needs.prepare.outputs.LLVM_VERSION}}
@@ -312,7 +312,7 @@ jobs:
           NAME=llvm-mingw-$TAG-ucrt-msys2-${{matrix.sys}}
           mv llvm-mingw $NAME
           tar -Jcf ../$NAME.tar.xz --format=ustar --numeric-owner --owner=0 --group=0 --sort=name --mtime="$BUILD_DATE" $NAME
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: msys2-${{matrix.sys}}-toolchain
           path: |
@@ -334,7 +334,7 @@ jobs:
           - { arch: armv7, crt: ucrt }
           - { arch: aarch64, crt: ucrt }
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: linux-stage1-${{matrix.crt}}-x86_64-toolchain
       - name: Unpack cross toolchain
@@ -343,13 +343,13 @@ jobs:
           rm llvm-mingw-*.tar.xz
           sudo mv llvm-mingw* /opt/llvm-mingw
           echo /opt/llvm-mingw/bin >> $GITHUB_PATH
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v8
         with:
           name: profile
       - name: Cache downloads
         id: cache-tarballs
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /opt/cache
           key: tarballs-${{ hashFiles('build-make.sh') }}
@@ -380,7 +380,7 @@ jobs:
           for i in make-*.tar.*; do
               if [ ! -L $i ]; then cp -a $i /opt/cache; fi
           done
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: windows-${{matrix.crt}}-${{matrix.arch}}-toolchain
           path: |
@@ -399,7 +399,7 @@ jobs:
           - aarch64
     runs-on: ${{startsWith(matrix.arch, 'a') && 'windows-11-arm' || 'windows-latest'}}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: windows-ucrt-${{matrix.arch}}-toolchain
       - name: Unpack toolchain
@@ -409,7 +409,7 @@ jobs:
           mv llvm-mingw-* c:\llvm-mingw
           echo "c:\llvm-mingw\busybox\bin" | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
           echo "c:\llvm-mingw\bin" | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run tests
         shell: sh
         run: |
@@ -440,7 +440,7 @@ jobs:
           - { arch: aarch64, target_arch: aarch64 }
     runs-on: ${{startsWith(matrix.arch, 'a') && 'windows-11-arm' || 'windows-latest'}}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: windows-ucrt-${{matrix.arch}}-toolchain
       - name: Unpack toolchain
@@ -451,7 +451,7 @@ jobs:
           echo "c:\llvm-mingw\bin" | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
           echo "c:\llvm-mingw\python\bin" | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
           echo "PYTHON_EXE=c:/llvm-mingw/python/bin/python3.exe" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Checkout llvm-project
         env:
           LLVM_VERSION: ${{needs.prepare.outputs.LLVM_VERSION}}
@@ -499,7 +499,7 @@ jobs:
           - { arch: aarch64 }
     runs-on: ${{startsWith(matrix.arch, 'a') && 'windows-11-arm' || 'windows-latest'}}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: windows-ucrt-${{matrix.arch}}-toolchain
       - name: Unpack toolchain
@@ -510,7 +510,7 @@ jobs:
           echo "c:\llvm-mingw\bin" | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
           echo "c:\llvm-mingw\python\bin" | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
           echo "PYTHON_EXE=c:/llvm-mingw/python/bin/python3.exe" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Checkout llvm-project
         env:
           LLVM_VERSION: ${{needs.prepare.outputs.LLVM_VERSION}}
@@ -563,7 +563,7 @@ jobs:
           - aarch64
     runs-on: ${{startsWith(matrix.arch, 'a') && 'windows-11-arm' || 'windows-latest'}}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: windows-ucrt-${{matrix.arch}}-toolchain
       - name: Unpack toolchain
@@ -574,7 +574,7 @@ jobs:
           echo "c:\llvm-mingw\bin" | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
           echo "c:\llvm-mingw\python\bin" | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
           echo "PYTHON_EXE=c:/llvm-mingw/python/bin/python3.exe" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Checkout llvm-project
         env:
           LLVM_VERSION: ${{needs.prepare.outputs.LLVM_VERSION}}
@@ -641,7 +641,7 @@ jobs:
           - armv7
           - aarch64
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: linux-asserts-x86_64-toolchain
       - name: Unpack cross toolchain
@@ -651,7 +651,7 @@ jobs:
           sudo mv llvm-mingw* /opt/llvm-mingw
           echo /opt/llvm-mingw/bin >> $GITHUB_PATH
       - name: Checkout ffmpeg
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ffmpeg/ffmpeg
           ref: n6.1.2
@@ -695,7 +695,7 @@ jobs:
             diffutils
           pacboy: >-
             nasm:p
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: windows-ucrt-x86_64-toolchain
       - name: Unpack toolchain
@@ -705,7 +705,7 @@ jobs:
           mv llvm-mingw-* /llvm-mingw
           echo /llvm-mingw/bin >> $GITHUB_PATH
       - name: Checkout ffmpeg
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ffmpeg/ffmpeg
           ref: n6.1.2
@@ -728,7 +728,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
       - name: Rearrange files
         run: |
           rm -rf linux-asserts*
