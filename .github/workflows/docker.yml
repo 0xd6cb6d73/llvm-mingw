@@ -37,7 +37,7 @@ jobs:
           fi
           cat ${{ env.REF }}
       - name: Download build parameters
-        uses: dawidd6/action-download-artifact@v10
+        uses: dawidd6/action-download-artifact@v19
         with:
           workflow: build.yml
           workflow_conclusion: success
@@ -149,7 +149,7 @@ jobs:
         with:
           ref: ${{ env.REF }}
       - name: Download toolchain
-        uses: dawidd6/action-download-artifact@v10
+        uses: dawidd6/action-download-artifact@v19
         with:
           workflow: build.yml
           workflow_conclusion: success
